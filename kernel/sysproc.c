@@ -75,6 +75,33 @@ int
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  uint64 va,mask;
+  int count;
+  argaddr(0,&va);
+  argint(1,&count);
+  argaddr(2,&mask);
+  if(count > 64) return -1;
+
+  uint64 kmask = 0;
+
+  struct proc *proc = myproc();
+
+  for(int i=0; i<count; i++){
+	pte_t* pte;
+	if((pte = walk(proc->pagetable,va,0)) != 0){// have check the PTE_V
+		if(*pte & PTE_A){
+			kmask += 1 << i;
+			*pte &= (~PTE_A);
+		}
+	}else{
+		return -1;
+	}
+	va += PGSIZE;
+  }
+  
+  if(copyout(proc->pagetable,mask,(char*)&kmask,sizeof kmask) < 0)
+	  return -1;
+   
   return 0;
 }
 #endif
@@ -100,3 +127,4 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
