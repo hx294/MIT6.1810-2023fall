@@ -104,6 +104,7 @@ test1()
     // restored correctly, causing i or j or the address ofj
     // to get an incorrect value.
     printf("\ntest1 failed: foo() executed fewer times than it was called\n");
+	printf("i=%d j=%d\n",i, j);
   } else {
     printf("test1 passed\n");
   }

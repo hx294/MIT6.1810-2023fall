@@ -78,7 +78,25 @@ usertrap(void)
 
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2)
+  {
+	if(p->alarmhd != 0 || p->alarmitv != 0){
+		p->trickscnt ++;
+		if(p->trickscnt == p->alarmitv && p->has_one == 0 ){
+			p->has_one = 1;
+			p->trickscnt = 0;
+			p->epc = p->trapframe->epc;
+			p->sp = p->trapframe->sp;
+			p->a1 = p->trapframe->a1;
+			p->ra = p->trapframe->ra;
+			p->s0 = p->trapframe->s0;
+			p->a0 = p->trapframe->a0;
+			p->a4 = p->trapframe->a4;
+			p->a5 = p->trapframe->a5;
+			p->trapframe->epc = p->alarmhd;
+		}
+	}
     yield();
+  }
 
   usertrapret();
 }
