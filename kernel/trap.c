@@ -68,9 +68,47 @@ usertrap(void)
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {
-    printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-    printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
-    setkilled(p);
+	  if(r_scause() == 15){
+			// write page fault
+			uint64 invalidad = r_stval();
+			pte_t *pte = 0;
+
+			if(invalidad < MAXVA)
+				pte = walk(p->pagetable,invalidad,0);
+
+			if( pte != 0 && (*pte & PTE_OW) != 0){
+				// the page was originally writeable
+				char* mem;
+				uint64 pa = PTE2PA(*pte);
+				uint flags = PTE_FLAGS(*pte) | PTE_W;
+				flags &= ~PTE_OW;
+
+				if((mem = kalloc()) == 0){
+					printf("usertrap(): memory is dead\n");
+					setkilled(p);
+				}else{
+
+					// 减少物理页引用数量
+					memmove(mem,(char*)pa,PGSIZE);
+					uvmunmap(p->pagetable,invalidad & ~0xfff,1,1);
+
+					if(mappages(p->pagetable,invalidad & ~0xfff,PGSIZE,(uint64)mem,flags) != 0){
+						printf("usertrap(): mappages fault\n");
+						kfree(mem);
+						setkilled(p);
+					}	
+				}
+			}else{
+				// the page was originally read-only
+				printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+				printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+				setkilled(p);
+			}
+	  }else{
+		printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+		printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+		setkilled(p);
+	}
   }
 
   if(killed(p))

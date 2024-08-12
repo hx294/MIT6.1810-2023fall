@@ -192,7 +192,7 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
       panic("uvmunmap: not a leaf");
     if(do_free){
       uint64 pa = PTE2PA(*pte);
-      kfree((void*)pa);
+	  kfree((char*)pa);
     }
     *pte = 0;
   }
@@ -312,6 +312,44 @@ uvmfree(pagetable_t pagetable, uint64 sz)
 int
 uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 {
+  pte_t *pte,*newpte;
+  uint64 pa, i;
+  uint flags;
+  //char *mem;
+
+  for(i = 0; i < sz; i += PGSIZE){
+    if((pte = walk(old, i, 0)) == 0)
+      panic("uvmcopy: pte should exist");
+    if((*pte & PTE_V) == 0)
+      panic("uvmcopy: page not present");
+    pa = PTE2PA(*pte);
+    flags = PTE_FLAGS(*pte) ;
+
+    if(mappages(new, i, PGSIZE, pa, flags) != 0){
+      goto err;
+    }
+
+	// 增加引用物理页数量
+	kaddrfcnt(pa);
+	// 清除PTE_W位,设置PTE_COW位
+	if((newpte = walk(new,i,0)) == 0)
+		panic("uvmcopy:");
+	if((*pte & PTE_W) != 0) 
+	{
+		*pte =(*pte & ~PTE_W) | PTE_OW;
+		*newpte =(*newpte & ~PTE_W) | PTE_OW;
+	}
+  }
+  return 0;
+
+ err:
+  uvmunmap(new,0,i/PGSIZE,1);
+  return -1;
+}
+/*
+int
+uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
+{
   pte_t *pte;
   uint64 pa, i;
   uint flags;
@@ -338,6 +376,7 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
 }
+*/
 
 // mark a PTE invalid for user access.
 // used by exec for the user stack guard page.
@@ -358,7 +397,7 @@ uvmclear(pagetable_t pagetable, uint64 va)
 int
 copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
-  uint64 n, va0, pa0;
+  uint64 n, va0, pa0 = 0;
   pte_t *pte;
 
   while(len > 0){
@@ -367,9 +406,25 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
       return -1;
     pte = walk(pagetable, va0, 0);
     if(pte == 0 || (*pte & PTE_V) == 0 || (*pte & PTE_U) == 0 ||
-       (*pte & PTE_W) == 0)
+       ((*pte & PTE_W) == 0 && (*pte & PTE_OW) ==0 ))
       return -1;
-    pa0 = PTE2PA(*pte);
+	else if((*pte & PTE_OW) != 0){
+		uint64 pa1 = PTE2PA(*pte);
+		uint flags = PTE_FLAGS(*pte) | PTE_W;
+		flags &= ~PTE_OW;
+		if((pa0 = (uint64)kalloc()) == 0){
+			return -1;
+		}
+		// 减少物理页连接数
+		memmove((char*)pa0,(char*)pa1,PGSIZE);
+		uvmunmap(pagetable,va0,1,1);
+		if((mappages(pagetable,va0,PGSIZE,pa0,flags)) != 0){
+			kfree((char*)pa0);
+			printf("copyout:");
+			return -1;
+		}
+	}else if((*pte & PTE_W) != 0)
+    	pa0 = PTE2PA(*pte);
     n = PGSIZE - (dstva - va0);
     if(n > len)
       n = len;

@@ -23,6 +23,17 @@ struct {
   struct run *freelist;
 } kmem;
 
+int pg_rf_cnt[PHYSTOP/PGSIZE + 10];
+
+//增加物理引用数量
+void kaddrfcnt(uint64 pa){
+	pg_rf_cnt[pa/PGSIZE] ++;
+}
+
+void ksubrfcnt(uint64 pa){
+	--pg_rf_cnt[pa/PGSIZE];
+}
+
 void
 kinit()
 {
@@ -47,6 +58,11 @@ void
 kfree(void *pa)
 {
   struct run *r;
+
+  ksubrfcnt((uint64)pa );
+
+  //check the number of links to  the physical page
+  if(pg_rf_cnt[(uint64)pa/PGSIZE] > 0) return;
 
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
@@ -78,5 +94,6 @@ kalloc(void)
 
   if(r)
     memset((char*)r, 5, PGSIZE); // fill with junk
+  pg_rf_cnt[(uint64)r/PGSIZE] = 1;
   return (void*)r;
 }

@@ -2153,6 +2153,7 @@ MAXVAplus(char *s)
       printf("%s: fork failed\n", s);
       exit(1);
     }
+	printf("plus\n");
     if(pid == 0){
       *(char*)a = 99;
       printf("%s: oops wrote %x\n", s, a);
@@ -2160,6 +2161,7 @@ MAXVAplus(char *s)
     }
     int xstatus;
     wait(&xstatus);
+	printf("plus\n");
     if(xstatus != -1)  // did kernel kill child?
       exit(1);
   }
