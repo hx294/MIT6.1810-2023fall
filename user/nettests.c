@@ -25,6 +25,8 @@ ping(uint16 sport, uint16 dport, int attempts)
     fprintf(2, "ping: connect() failed\n");
     exit(1);
   }
+  
+  //printf("111111111111\n");
 
   for(int i = 0; i < attempts; i++) {
     if(write(fd, obuf, strlen(obuf)) < 0){
@@ -33,6 +35,8 @@ ping(uint16 sport, uint16 dport, int attempts)
     }
   }
 
+ // printf("22222222222\n");
+
   char ibuf[128];
   int cc = read(fd, ibuf, sizeof(ibuf)-1);
   if(cc < 0){
@@ -40,12 +44,16 @@ ping(uint16 sport, uint16 dport, int attempts)
     exit(1);
   }
 
+  //printf("333333333333\n");
+
   close(fd);
   ibuf[cc] = '\0';
   if(strcmp(ibuf, "this is the host!") != 0){
     fprintf(2, "ping didn't receive correct payload\n");
     exit(1);
   }
+
+  //printf("4444444444444\n");
 }
 
 // Encode a DNS name
