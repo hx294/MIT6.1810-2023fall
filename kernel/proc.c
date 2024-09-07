@@ -30,8 +30,7 @@ struct spinlock wait_lock;
 // Map it high in memory, followed by an invalid
 // guard page.
 void
-proc_mapstacks(pagetable_t kpgtbl)
-{
+proc_mapstacks(pagetable_t kpgtbl) {
   struct proc *p;
   
   for(p = proc; p < &proc[NPROC]; p++) {
@@ -43,7 +42,7 @@ proc_mapstacks(pagetable_t kpgtbl)
   }
 }
 
-// initialize the proc table.
+// initialize the proc table at boot time.
 void
 procinit(void)
 {
@@ -53,7 +52,6 @@ procinit(void)
   initlock(&wait_lock, "wait_lock");
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
-      p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
   }
 }
@@ -71,8 +69,7 @@ cpuid()
 // Return this CPU's cpu struct.
 // Interrupts must be disabled.
 struct cpu*
-mycpu(void)
-{
+mycpu(void) {
   int id = cpuid();
   struct cpu *c = &cpus[id];
   return c;
@@ -80,8 +77,7 @@ mycpu(void)
 
 // Return the current struct proc *, or zero if none.
 struct proc*
-myproc(void)
-{
+myproc(void) {
   push_off();
   struct cpu *c = mycpu();
   struct proc *p = c->proc;
@@ -90,8 +86,7 @@ myproc(void)
 }
 
 int
-allocpid()
-{
+allocpid() {
   int pid;
   
   acquire(&pid_lock);
@@ -171,8 +166,8 @@ freeproc(struct proc *p)
   p->state = UNUSED;
 }
 
-// Create a user page table for a given process, with no user memory,
-// but with trampoline and trapframe pages.
+// Create a user page table for a given process,
+// with no user memory, but with trampoline pages.
 pagetable_t
 proc_pagetable(struct proc *p)
 {
@@ -193,8 +188,7 @@ proc_pagetable(struct proc *p)
     return 0;
   }
 
-  // map the trapframe page just below the trampoline page, for
-  // trampoline.S.
+  // map the trapframe just below TRAMPOLINE, for trampoline.S.
   if(mappages(pagetable, TRAPFRAME, PGSIZE,
               (uint64)(p->trapframe), PTE_R | PTE_W) < 0){
     uvmunmap(pagetable, TRAMPOLINE, 1, 0);
@@ -216,8 +210,7 @@ proc_freepagetable(pagetable_t pagetable, uint64 sz)
 }
 
 // a user program that calls exec("/init")
-// assembled from ../user/initcode.S
-// od -t xC ../user/initcode
+// od -t xC initcode
 uchar initcode[] = {
   0x17, 0x05, 0x00, 0x00, 0x13, 0x05, 0x45, 0x02,
   0x97, 0x05, 0x00, 0x00, 0x93, 0x85, 0x35, 0x02,
@@ -237,9 +230,9 @@ userinit(void)
   p = allocproc();
   initproc = p;
   
-  // allocate one user page and copy initcode's instructions
+  // allocate one user page and copy init's instructions
   // and data into it.
-  uvmfirst(p->pagetable, initcode, sizeof(initcode));
+  uvminit(p->pagetable, initcode, sizeof(initcode));
   p->sz = PGSIZE;
 
   // prepare for the very first "return" from kernel to user.
@@ -259,12 +252,12 @@ userinit(void)
 int
 growproc(int n)
 {
-  uint64 sz;
+  uint sz;
   struct proc *p = myproc();
 
   sz = p->sz;
   if(n > 0){
-    if((sz = uvmalloc(p->pagetable, sz, sz + n, PTE_W)) == 0) {
+    if((sz = uvmalloc(p->pagetable, sz, sz + n)) == 0) {
       return -1;
     }
   } else if(n < 0){
@@ -390,7 +383,7 @@ exit(int status)
 int
 wait(uint64 addr)
 {
-  struct proc *pp;
+  struct proc *np;
   int havekids, pid;
   struct proc *p = myproc();
 
@@ -399,32 +392,32 @@ wait(uint64 addr)
   for(;;){
     // Scan through table looking for exited children.
     havekids = 0;
-    for(pp = proc; pp < &proc[NPROC]; pp++){
-      if(pp->parent == p){
+    for(np = proc; np < &proc[NPROC]; np++){
+      if(np->parent == p){
         // make sure the child isn't still in exit() or swtch().
-        acquire(&pp->lock);
+        acquire(&np->lock);
 
         havekids = 1;
-        if(pp->state == ZOMBIE){
+        if(np->state == ZOMBIE){
           // Found one.
-          pid = pp->pid;
-          if(addr != 0 && copyout(p->pagetable, addr, (char *)&pp->xstate,
-                                  sizeof(pp->xstate)) < 0) {
-            release(&pp->lock);
+          pid = np->pid;
+          if(addr != 0 && copyout(p->pagetable, addr, (char *)&np->xstate,
+                                  sizeof(np->xstate)) < 0) {
+            release(&np->lock);
             release(&wait_lock);
             return -1;
           }
-          freeproc(pp);
-          release(&pp->lock);
+          freeproc(np);
+          release(&np->lock);
           release(&wait_lock);
           return pid;
         }
-        release(&pp->lock);
+        release(&np->lock);
       }
     }
 
     // No point waiting if we don't have any children.
-    if(!havekids || killed(p)){
+    if(!havekids || p->killed){
       release(&wait_lock);
       return -1;
     }
@@ -446,12 +439,10 @@ scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-
+  
   c->proc = 0;
   for(;;){
-    // The most recent process to run may have had interrupts
-    // turned off; enable them to avoid a deadlock if all
-    // processes are waiting.
+    // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
     for(p = proc; p < &proc[NPROC]; p++) {
@@ -525,11 +516,8 @@ forkret(void)
     // File system initialization must be run in the context of a
     // regular process (e.g., because it calls sleep), and thus cannot
     // be run from main().
-    fsinit(ROOTDEV);
-
     first = 0;
-    // ensure other cores see first=0.
-    __sync_synchronize();
+    fsinit(ROOTDEV);
   }
 
   usertrapret();
@@ -608,25 +596,6 @@ kill(int pid)
   return -1;
 }
 
-void
-setkilled(struct proc *p)
-{
-  acquire(&p->lock);
-  p->killed = 1;
-  release(&p->lock);
-}
-
-int
-killed(struct proc *p)
-{
-  int k;
-  
-  acquire(&p->lock);
-  k = p->killed;
-  release(&p->lock);
-  return k;
-}
-
 // Copy to either a user address, or kernel address,
 // depending on usr_dst.
 // Returns 0 on success, -1 on error.
@@ -665,7 +634,6 @@ procdump(void)
 {
   static char *states[] = {
   [UNUSED]    "unused",
-  [USED]      "used",
   [SLEEPING]  "sleep ",
   [RUNNABLE]  "runble",
   [RUNNING]   "run   ",

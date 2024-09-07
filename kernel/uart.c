@@ -92,17 +92,21 @@ uartputc(int c)
     for(;;)
       ;
   }
-  while(uart_tx_w == uart_tx_r + UART_TX_BUF_SIZE){
-    // buffer is full.
-    // wait for uartstart() to open up space in the buffer.
-    sleep(&uart_tx_r, &uart_tx_lock);
-  }
-  uart_tx_buf[uart_tx_w % UART_TX_BUF_SIZE] = c;
-  uart_tx_w += 1;
-  uartstart();
-  release(&uart_tx_lock);
-}
 
+  while(1){
+    if(uart_tx_w == uart_tx_r + UART_TX_BUF_SIZE){
+      // buffer is full.
+      // wait for uartstart() to open up space in the buffer.
+      sleep(&uart_tx_r, &uart_tx_lock);
+    } else {
+      uart_tx_buf[uart_tx_w % UART_TX_BUF_SIZE] = c;
+      uart_tx_w += 1;
+      uartstart();
+      release(&uart_tx_lock);
+      return;
+    }
+  }
+}
 
 // alternate version of uartputc() that doesn't 
 // use interrupts, for use by kernel printf() and
@@ -171,7 +175,7 @@ uartgetc(void)
 
 // handle a uart interrupt, raised because input has
 // arrived, or the uart is ready for more output, or
-// both. called from devintr().
+// both. called from trap.c.
 void
 uartintr(void)
 {
