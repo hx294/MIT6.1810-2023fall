@@ -161,6 +161,7 @@ concur(void)
         x = x * 1103515245 + 12345;
         if((x % 3) == 0) {
           symlink("/testsymlink/z", "/testsymlink/y");
+		  //printf("1\n");
           if (stat_slink("/testsymlink/y", &st) == 0) {
             m++;
             if(st.type != T_SYMLINK) {
@@ -169,6 +170,7 @@ concur(void)
             }
           }
         } else {
+		  //printf("2\n");
           unlink("/testsymlink/y");
         }
       }

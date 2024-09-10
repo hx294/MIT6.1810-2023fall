@@ -255,13 +255,16 @@ iget(uint dev, uint inum)
   for(ip = &itable.inode[0]; ip < &itable.inode[NINODE]; ip++){
     if(ip->ref > 0 && ip->dev == dev && ip->inum == inum){
       ip->ref++;
+	  printf("ref = %d\n",ip->ref);
       release(&itable.lock);
       return ip;
     }
+	if(ip->dev == dev && ip->inum == inum){
+		printf("ref = %d\n",ip->ref);
+	}
     if(empty == 0 && ip->ref == 0)    // Remember empty slot.
       empty = ip;
   }
-  //printf("cnt = %d\n",empty-itable.inode);
 
   // Recycle an inode entry.
   if(empty == 0)
