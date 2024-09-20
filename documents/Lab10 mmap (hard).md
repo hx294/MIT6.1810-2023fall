@@ -31,7 +31,7 @@ munmap 应该在地址范围的mmap映射段。如果有MAP_SHARED，则写回�
 
 修改Makefile，user/user.h,user/usys.pl,syscall.c,syscall.h，sysproc.c,
 
-![image-20240914212400531](Lab10 mmap (hard)/image-20240914212400531.png)
+![image-20240914212400531](<Lab10 mmap (hard)/image-20240914212400531.png>)
 
 - Keep track of what `mmap` has mapped for each process. Define a structure corresponding to the VMA (virtual memory area) described in the "virtual memory for applications" lecture. This should record the address, length, permissions, file, etc. for a virtual memory range created by `mmap`. Since the xv6 kernel doesn't have a variable-size memory allocator in the kernel, it's OK to declare a fixed-size array of VMAs and allocate from that array as needed. A size of 16 should be sufficient.
 
@@ -208,7 +208,7 @@ exec(char *path, char **argv)
 }
 ```
 
-![image-20240919134120238](Lab10 mmap (hard)/image-20240919134120238.png)
+![image-20240919134120238](<Lab10 mmap (hard)/image-20240919134120238.png>)
 
 fd对应proc结构体中的ofile数组的下标。
 
@@ -257,13 +257,13 @@ sys_mmap(void){
 }
 ```
 
-![image-20240917155018316](Lab10 mmap (hard)/image-20240917155018316.png)
+![image-20240917155018316](<Lab10 mmap (hard)/image-20240917155018316.png>)
 
 - Add code to cause a page-fault in a mmap-ed region to allocate a page of physical memory, read 4096 bytes of the relevant file into that page, and map it into the user address space. Read the file with `readi`, which takes an offset argument at which tok read in the file (but you will have to lock/unlock the inode passed to `readi`). Don't forget to set the permissions correctly on the page. Run `mmaptest`; it should get to the first `munmap`.
 
-![image-20240811192549361](Lab10 mmap (hard)/image-20240811192549361.png)
+![image-20240811192549361](<Lab10 mmap (hard)/image-20240811192549361.png>)
 
-![image-20240917163716230](Lab10 mmap (hard)/image-20240917163716230.png)
+![image-20240917163716230](<Lab10 mmap (hard)/image-20240917163716230.png>)
 
 一开始的思路是先用uvmalloc来分配内存，然后readi写入。但是我忽略了uvmmalloc传入的权限没有写入权限，导致readi崩溃。修正的思路：无脑传入PTE_W，readi后再修复页表。
 
@@ -325,7 +325,7 @@ bad:	printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
 
 在munmap处报错：
 
-![image-20240919134728998](Lab10 mmap (hard)/image-20240919134728998.png)
+![image-20240919134728998](<Lab10 mmap (hard)/image-20240919134728998.png>)
 
 - Implement `munmap`: find the VMA for the address range and unmap the specified pages (hint: use `uvmunmap`). If `munmap` removes all pages of a previous `mmap`, it should decrement the reference count of the corresponding `struct file`. If an unmapped page has been modified and the file is mapped `MAP_SHARED`, write the page back to the file. Look at `filewrite` for inspiration.
 
@@ -395,7 +395,7 @@ filewrite(struct file *f, uint64 addr, int n)
 
 - Modify `exit` to unmap the process's mapped regions as if `munmap` had been called. Run `mmaptest`; all tests through `test mmap two files` should pass, but probably not `test fork`.
 
-![image-20240919195848232](Lab10 mmap (hard)/image-20240919195848232.png)
+![image-20240919195848232](<Lab10 mmap (hard)/image-20240919195848232.png>)
 
 报错，因为可读文件被映射到可写内存。
 
@@ -464,7 +464,7 @@ sys_munmap(void){
 }
 ```
 
-![image-20240920115017100](Lab10 mmap (hard)/image-20240920115017100.png)
+![image-20240920115017100](<Lab10 mmap (hard)/image-20240920115017100.png>)
 
 - Modify `fork` to ensure that the child has the same mapped regions as the parent. Don't forget to increment the reference count for a VMA's `struct file`. In the page fault handler of the child, it is OK to allocate a new physical page instead of sharing a page with the parent. The latter would be cooler, but it would require more implementation work. Run `mmaptest`; it should pass all the tests.
 
@@ -585,9 +585,9 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 }
 ```
 
-![image-20240920191159320](Lab10 mmap (hard)/image-20240920191159320.png)
+![image-20240920191159320](<Lab10 mmap (hard)/image-20240920191159320.png>)
 
-![image-20240920201631365](Lab10 mmap (hard)/image-20240920201631365.png)
+![image-20240920201631365](<Lab10 mmap (hard)/image-20240920201631365.png>)
 
 ## 小结
 

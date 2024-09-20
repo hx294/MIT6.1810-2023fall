@@ -49,7 +49,7 @@ acquire(struct spinlock *lk)
 
 hint1 You can use the constant `NCPU` from kernel/param.h
 
-![image-20240828164254448](Lab8 locks/image-20240828164254448.png)
+![image-20240828164254448](<Lab8 locks/image-20240828164254448.png>)
 
 最大数量的cpu
 
@@ -248,7 +248,7 @@ bcache lock 和 bucket lock 。 避免死锁。
 
 test2报错：
 
-![image-20240902211003678](Lab8 locks/image-20240902211003678.png)
+![image-20240902211003678](<Lab8 locks/image-20240902211003678.png>)
 
 test2是测试并发创建缓冲区的。
 
@@ -333,7 +333,7 @@ bget(uint dev, uint blockno)
 
 brlese和其他函数的实现则比较简单，就不用列出来了。
 
-![image-20240903231415068](Lab8 locks/image-20240903231415068.png)
+![image-20240903231415068](<Lab8 locks/image-20240903231415068.png>)
 
 ## 实验小结
 

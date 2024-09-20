@@ -12,7 +12,7 @@
 
 return x+3;转化为汇编就是地址6~c的指令。a0是保存参数的寄存器，也是返回值。
 
-![image-20240808112333378](Lab4 traps/image-20240808112333378.png)
+![image-20240808112333378](<Lab4 traps/image-20240808112333378.png>)
 
 ```c
 int g(int x) {
@@ -315,7 +315,7 @@ usertrapret(void)
 
 结果：
 
-![image-20240809110955517](Lab4 traps/image-20240809110955517.png)
+![image-20240809110955517](<Lab4 traps/image-20240809110955517.png>)
 
 点比示例多，不过最后一条hint说只要打印“alarm!"就行。
 
@@ -371,7 +371,7 @@ trap.c文件中usertrap()的再修改：
 
 结果：
 
-**![image-20240809203751932](Lab4 traps/image-20240809203751932.png)**
+**![image-20240809203751932](<Lab4 traps/image-20240809203751932.png>)**
 
 ## 总结
 

@@ -10,7 +10,7 @@ mkfs创建xv6文件系统镜像，决定文件系统拥有多少block。kernel/p
 
 make qemu:
 
-![image-20240906204025727](Lab9 file system/image-20240906204025727.png)
+![image-20240906204025727](<Lab9 file system/image-20240906204025727.png>)
 
 说明了mkfs/mkfs创建了什么。
 
@@ -93,7 +93,7 @@ bn是相对于文件的，而blockno是磁盘上的。bmap()将bn映射到blockn
 
 这个任务增加xv6文件的最大大小。
 
-![image-20240907173047289](Lab9 file system/image-20240907173047289.png)
+![image-20240907173047289](<Lab9 file system/image-20240907173047289.png>)
 
 这个测试失败，因为bigfile需要65803个block。
 
@@ -117,7 +117,7 @@ bn是相对于文件的，而blockno是磁盘上的。bmap()将bn映射到blockn
 
 - 理解bmap().画出示意图。
 
-![image-20240907175423356](Lab9 file system/image-20240907175423356.png)
+![image-20240907175423356](<Lab9 file system/image-20240907175423356.png>)
 
 画的比较粗糙。
 
@@ -170,7 +170,7 @@ struct dinode {
 
 删除fs.img
 
-![image-20240907195319567](Lab9 file system/image-20240907195319567.png)
+![image-20240907195319567](<Lab9 file system/image-20240907195319567.png>)
 
 - If your file system gets into a bad state, perhaps by crashing, delete `fs.img` (do this from Unix, not xv6). `make` will build a new clean file system image for you.
 
@@ -315,9 +315,9 @@ itrunc(struct inode *ip)
 }
 ```
 
-![image-20240909124443700](Lab9 file system/image-20240909124443700.png)
+![image-20240909124443700](<Lab9 file system/image-20240909124443700.png>)
 
-![image-20240907224610736](Lab9 file system/image-20240907224610736.png)
+![image-20240907224610736](<Lab9 file system/image-20240907224610736.png>)
 
 ## Symbolic links ([moderate](https://pdos.csail.mit.edu/6.S081/2024/labs/guidance.html))
 
@@ -346,7 +346,7 @@ itrunc(struct inode *ip)
 
 按要求修改即可，然后xv6就能跑了。
 
-![image-20240908172306520](Lab9 file system/image-20240908172306520.png)
+![image-20240908172306520](<Lab9 file system/image-20240908172306520.png>)
 
 - Implement the `symlink(target, path)` system call to create a new symbolic link at path that refers to target. Note that target does not need to exist for the system call to succeed. You will need to choose somewhere to store the target path of a symbolic link, for example, in the inode's data blocks. `symlink` should return an integer representing success (0) or failure (-1) similar to `link` and `unlink`.
 
@@ -486,7 +486,7 @@ sys_open(void)
 
 ```
 
-![image-20240910194045560](Lab9 file system/image-20240910194045560.png)
+![image-20240910194045560](<Lab9 file system/image-20240910194045560.png>)
 
 先说结论：sys_symlink要调用iput处理y的inode
 
@@ -589,9 +589,9 @@ if((ip = dirlookup(dp, name, 0)) != 0){
   }
 ```
 
-![image-20240910200239013](Lab9 file system/image-20240910200239013.png)
+![image-20240910200239013](<Lab9 file system/image-20240910200239013.png>)
 
-![image-20240910202336530](Lab9 file system/image-20240910202336530.png)
+![image-20240910202336530](<Lab9 file system/image-20240910202336530.png>)
 
 ## 小结
 

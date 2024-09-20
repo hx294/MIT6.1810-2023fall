@@ -6,17 +6,17 @@ answers-syscall.txt
 
 ### Looking at the backtrace output, which function called `syscall`?
 
-![image-20240727203737045](lab 2 system calls/image-20240727203737045.png)
+![image-20240727203737045](<lab 2 system calls/image-20240727203737045.png>)
 
 answer: #0
 
 ### What is the value of `p->trapframe->a7` and what does that value represent? (Hint: look `user/initcode.S`, the first user program xv6 starts.)
 
-![image-20240723220302445](lab 2 system calls/image-20240723220302445.png)
+![image-20240723220302445](<lab 2 system calls/image-20240723220302445.png>)
 
 a7等于0x7
 
-![image-20240723220518358](lab 2 system calls/image-20240723220518358.png)
+![image-20240723220518358](<lab 2 system calls/image-20240723220518358.png>)
 
 a7传入了SYS_exec 
 
@@ -24,7 +24,7 @@ a7传入了SYS_exec
 
 ### What was the previous mode that the CPU was in?
 
-![image-20240727201348515](lab 2 system calls/image-20240727201348515.png)
+![image-20240727201348515](<lab 2 system calls/image-20240727201348515.png>)
 
 > The SPP bit indicates the privilege level at which a hart was executing before entering supervisor mode. When a trap is taken, SPP is set to 0 if the trap originated from user mode, or 1 otherwise. When an SRET instruction (see Section 3.3.2) is executed to return from the trap handler, the privilege level is set to user mode if the SPP bit is 0, or supervisor mode if the SPP bit is 1; SPP is then set to 0
 
@@ -32,7 +32,7 @@ a7传入了SYS_exec
 
 返回时，spp被置为0；
 
-![image-20240727201929354](lab 2 system calls/image-20240727201929354.png)
+![image-20240727201929354](<lab 2 system calls/image-20240727201929354.png>)
 
 spp为第9位，为0。
 
@@ -40,26 +40,26 @@ spp为第9位，为0。
 
 ### Write down the assembly instruction the kernel is panicing at. Which register corresponds to the variable `num`?
 
-![image-20240727211228129](lab 2 system calls/image-20240727211228129.png)
+![image-20240727211228129](<lab 2 system calls/image-20240727211228129.png>)
 
 > num = * (int *) 0;
 >     80002052:	00002683          	lw	a3,0(zero) # 0 <_entry-0x80000000>
 
-![image-20240727211318877](lab 2 system calls/image-20240727211318877.png)
+![image-20240727211318877](<lab 2 system calls/image-20240727211318877.png>)
 
 所以变量num存储在a3中
 
 ### Why does the kernel crash? Hint: look at figure 3-3 in the text; is address 0 mapped in the kernel address space? Is that confirmed by the value in `scause` above? (See description of `scause` in [RISC-V privileged instructions](https://pdos.csail.mit.edu/6.828/2023/labs/n//github.com/riscv/riscv-isa-manual/releases/download/Priv-v1.12/riscv-privileged-20211203.pdf))
 
-![image-20240727220847075](lab 2 system calls/image-20240727220847075.png)
+![image-20240727220847075](<lab 2 system calls/image-20240727220847075.png>)
 
 从图可以看出，kernbase=0x80000000是内核开始的空间，所以0不在内核空间。
 
-![image-20240727222248417](lab 2 system calls/image-20240727222248417.png)
+![image-20240727222248417](<lab 2 system calls/image-20240727222248417.png>)
 
-![image-20240727222318814](lab 2 system calls/image-20240727222318814.png)
+![image-20240727222318814](<lab 2 system calls/image-20240727222318814.png>)
 
-![image-20240727222214466](lab 2 system calls/image-20240727222214466.png)
+![image-20240727222214466](<lab 2 system calls/image-20240727222214466.png>)
 
 之前scause的值为0xd,所以发生了加载页错误。
 
@@ -67,7 +67,7 @@ spp为第9位，为0。
 
 p就是proc结构体
 
-![image-20240727223516324](lab 2 system calls/image-20240727223516324.png)
+![image-20240727223516324](<lab 2 system calls/image-20240727223516324.png>)
 
 如上图
 
@@ -176,7 +176,7 @@ const char* syscall_names[] = {
 
 结果：
 
-![image-20240729002954326](lab 2 system calls/image-20240729002954326.png)
+![image-20240729002954326](<lab 2 system calls/image-20240729002954326.png>)
 
 tip: 这里冒号后面少个空格，make grade时候检测不过去。后面改了
 
@@ -237,7 +237,7 @@ getusedproc(void){
 
 结果：
 
-![image-20240729002906994](lab 2 system calls/image-20240729002906994.png)
+![image-20240729002906994](<lab 2 system calls/image-20240729002906994.png>)
 
 ## 总结
 
@@ -245,5 +245,5 @@ getusedproc(void){
 
 一开始位于用户模式，user.pl 提供了接口进入内核模式，再通过syscall进入具体的系统调用。
 
-![image-20240803221255046](lab 2 system calls/image-20240803221255046.png)
+![image-20240803221255046](<lab 2 system calls/image-20240803221255046.png>)
 

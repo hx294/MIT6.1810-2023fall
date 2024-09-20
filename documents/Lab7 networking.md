@@ -128,7 +128,7 @@ e1000_recv(void)
 
 还有到达的数量可能多于环的大小。所以处理一定要及时，所以采用循环。还看到有一种直接在这个函数中死循环不出去，不知道这种方法的可行性，以后再探究。[MIT6.S081-Lab7 Lab Networking [2021Fall\] - duile - 博客园 (cnblogs.com)](https://www.cnblogs.com/duile/p/16277647.html#写在前面)
 
-![image-20240826185305488](Lab7 networking/image-20240826185305488.png)
+![image-20240826185305488](<Lab7 networking/image-20240826185305488.png>)
 
 ### 总结
 

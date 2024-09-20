@@ -24,11 +24,11 @@ $表示结尾
 
 一种是这种：
 
-![image-20240713225441246](Xv6 and Unix utilities/image-20240713225441246.png)
+![image-20240713225441246](<Xv6 and Unix utilities/image-20240713225441246.png>)
 
 一种是跟着文件，有两个参数（或更多：
 
-![image-20240713225531779](Xv6 and Unix utilities/image-20240713225531779.png)
+![image-20240713225531779](<Xv6 and Unix utilities/image-20240713225531779.png>)
 
 #### 查看rm
 
@@ -111,7 +111,7 @@ sleep:
  ret
 ```
 
-![image-20240713232658455](Xv6 and Unix utilities/image-20240713232658455.png)
+![image-20240713232658455](<Xv6 and Unix utilities/image-20240713232658455.png>)
 
 这小节做完去补risc-v。
 
@@ -139,7 +139,7 @@ main (int argc, char *argv[])
 
 **结果**
 
-![image-20240714160158304](Xv6 and Unix utilities/image-20240714160158304.png)
+![image-20240714160158304](<Xv6 and Unix utilities/image-20240714160158304.png>)
 
 ### pingpong
 
@@ -177,7 +177,7 @@ main (int argc, char *argv[])
 }
 ```
 
-![image-20240714162617595](Xv6 and Unix utilities/image-20240714162617595.png)
+![image-20240714162617595](<Xv6 and Unix utilities/image-20240714162617595.png>)
 
 ### primes ([moderate](https://pdos.csail.mit.edu/6.828/2023/labs/guidance.html))/([hard](https://pdos.csail.mit.edu/6.828/2023/labs/guidance.html))
 
@@ -212,7 +212,7 @@ loop:
         send n to right neighbor
 ```
 
-![image-20240715200028121](Xv6 and Unix utilities/image-20240715200028121.png)
+![image-20240715200028121](<Xv6 and Unix utilities/image-20240715200028121.png>)
 
 这个线性管道的性质不能代表一般csp的性质，但是即使是严格的线性管道，也是很强大。在linux中管道和过滤器方法非常著名。
 
@@ -292,7 +292,7 @@ int main(int argc ,char* argv[]){
 
 ```
 
-![image-20240716001358341](Xv6 and Unix utilities/image-20240716001358341.png)
+![image-20240716001358341](<Xv6 and Unix utilities/image-20240716001358341.png>)
 
 ### find ([moderate](https://pdos.csail.mit.edu/6.828/2023/labs/guidance.html))
 
@@ -443,9 +443,9 @@ main(int argc, char* argv[]){
 
 ```
 
-## ![image-20240716235853586](Xv6 and Unix utilities/image-20240716235853586.png)
+## ![image-20240716235853586](<Xv6 and Unix utilities/image-20240716235853586.png>)
 
-### ![image-20240717000057760](Xv6 and Unix utilities/image-20240717000057760.png)
+### ![image-20240717000057760](<Xv6 and Unix utilities/image-20240717000057760.png>)
 
 
 
@@ -521,9 +521,9 @@ main(int argc, char* argv[]){
 
 **结果**
 
-![image-20240716233307366](Xv6 and Unix utilities/image-20240716233307366.png)
+![image-20240716233307366](<Xv6 and Unix utilities/image-20240716233307366.png>)
 
-![image-20240717000132613](Xv6 and Unix utilities/image-20240717000132613.png)
+![image-20240717000132613](<Xv6 and Unix utilities/image-20240717000132613.png>)
 
 休息了。
 
@@ -535,9 +535,9 @@ main(int argc, char* argv[]){
 
 **结果**
 
-![image-20240718160919970](Xv6 and Unix utilities/image-20240718160919970.png)
+![image-20240718160919970](<Xv6 and Unix utilities/image-20240718160919970.png>)
 
-![image-20240718160955520](Xv6 and Unix utilities/image-20240718160955520.png)
+![image-20240718160955520](<Xv6 and Unix utilities/image-20240718160955520.png>)
 
 ## 总结
 

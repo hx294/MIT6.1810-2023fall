@@ -125,7 +125,7 @@ proc_pagetable(struct proc *p)
 }
 ```
 
-![image-20240804161256265](lab3 page table/image-20240804161256265-17227591778131.png)
+![image-20240804161256265](<lab3 page table/image-20240804161256265-17227591778131.png>)
 
 Which other xv6 system call(s) could be made faster using this shared page? Explain how.
 
@@ -191,7 +191,7 @@ vmprint(pagetable_t pagetable){
 
 结果：
 
-![image-20240804193802943](lab3 page table/image-20240804193802943.png)
+![image-20240804193802943](<lab3 page table/image-20240804193802943.png>)
 
 回答问题：
 
@@ -215,9 +215,9 @@ page table 0x0000000087f6b000
 init: starting sh
 ```
 
-![image-20240804235550357](lab3 page table/image-20240804235550357.png)
+![image-20240804235550357](<lab3 page table/image-20240804235550357.png>)
 
-![image-20240804225949297](lab3 page table/image-20240804225949297.png)
+![image-20240804225949297](<lab3 page table/image-20240804225949297.png>)
 
 第一个01b,可执行可读用户。text
 
@@ -366,7 +366,7 @@ walk(pagetable_t pagetable, uint64 va, int alloc)
 #define PX(level, va) ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
 ```
 
-![image-20240804225949297](lab3 page table/image-20240804225949297.png)
+![image-20240804225949297](<lab3 page table/image-20240804225949297.png>)
 
 12位是偏移，即pgshift，L2则对应右移12+2*9=30位后的低9位，px表达的就是这个意思。
 
@@ -431,11 +431,11 @@ sys_pgaccess(void)
 
 结果：
 
-![image-20240804235113783](lab3 page table/image-20240804235113783.png)
+![image-20240804235113783](<lab3 page table/image-20240804235113783.png>)
 
 **总结果**
 
-![image-20240805001422598](lab3 page table/image-20240805001422598.png)
+![image-20240805001422598](<lab3 page table/image-20240805001422598.png>)
 
 文件不知道填啥。
 

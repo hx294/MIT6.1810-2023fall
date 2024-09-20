@@ -44,11 +44,11 @@ if (current_thread != next_thread) {         /* switch threads?  */
 
 查到：
 
-![image-20240820123930008](Lab6 Multithreading/image-20240820123930008.png)
+![image-20240820123930008](<Lab6 Multithreading/image-20240820123930008.png>)
 
 然后callee-savd registers 包括：
 
-![image-20240820125349572](Lab6 Multithreading/image-20240820125349572.png)
+![image-20240820125349572](<Lab6 Multithreading/image-20240820125349572.png>)
 
 ra不属于callee-saved register,但由于第一次需要跳转到特定函数，所以也需要它。第一次后都不需要ra发生改变，这里还是和内核的切换有所区别。
 
@@ -98,7 +98,7 @@ thread_switch:
 
 - The breakpoint may (or may not) be triggered before you even run `uthread`. How could that happen?
 
-![image-20240820132001188](Lab6 Multithreading/image-20240820132001188.png)
+![image-20240820132001188](<Lab6 Multithreading/image-20240820132001188.png>)
 
 可以看出qemu还没运行uthread，便有了断点。
 
@@ -110,7 +110,7 @@ thread_switch:
 
 同时发现打了断点后，在两个地址空间有了断点。
 
-![image-20240820140209854](Lab6 Multithreading/image-20240820140209854.png)
+![image-20240820140209854](<Lab6 Multithreading/image-20240820140209854.png>)
 
 查了，应该是编译器优化造成的。查看uthread.asm文件：
 
@@ -181,7 +181,7 @@ void put(int key, int value)
 
 由于table[i]当作参数,所以不能将锁写在函数内部。
 
-![image-20240820110409624](Lab6 Multithreading/image-20240820110409624.png)
+![image-20240820110409624](<Lab6 Multithreading/image-20240820110409624.png>)
 
 一个不理解的点：
 
@@ -218,7 +218,7 @@ barrier()
 }
 ```
 
-![image-20240820122327311](Lab6 Multithreading/image-20240820122327311.png)
+![image-20240820122327311](<Lab6 Multithreading/image-20240820122327311.png>)
 
 ### 总结
 

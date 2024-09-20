@@ -100,7 +100,7 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 
 2. Modify usertrap() to recognize page faults. When a write page-fault occurs on a COW page that was originally writeable, allocate a new page with kalloc(), copy the old page to the new page, and install the new page in the PTE with `PTE_W` set. Pages that were originally read-only (not mapped `PTE_W`, like pages in the text segment) should remain read-only and shared between parent and child; a process that tries to write such a page should be killed.
 
-![image-20240811192549361](lab5 Copy-on-Write Fork for xv6/image-20240811192549361.png)
+![image-20240811192549361](<lab5 Copy-on-Write Fork for xv6/image-20240811192549361.png>)
 
 page_fault属于exception,store page fault 的scause为15。由于虚拟地址可能大于最大的，所以需要检查。需要清除原来的PTE_OW位，并设置PTE_W位。并将原来的页内容复制过来。减少对原来页的映射。在uvmunmap中，会调用kfree，而kfree会减少引用数量，如果等于0，会进行真正的free。
 
@@ -268,7 +268,7 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 
 ### 结果
 
-![image-20240813021230903](lab5 Copy-on-Write Fork for xv6/image-20240813021230903.png)
+![image-20240813021230903](<lab5 Copy-on-Write Fork for xv6/image-20240813021230903.png>)
 
 ### 总结
 
