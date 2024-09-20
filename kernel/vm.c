@@ -1,10 +1,13 @@
 #include "param.h"
 #include "types.h"
 #include "memlayout.h"
+#include "spinlock.h"
 #include "elf.h"
 #include "riscv.h"
 #include "defs.h"
 #include "fs.h"
+#include "sleeplock.h"
+#include "proc.h"
 
 /*
  * the kernel's page table.
@@ -303,6 +306,17 @@ uvmfree(pagetable_t pagetable, uint64 sz)
   freewalk(pagetable);
 }
 
+static int
+waitforalloc(uint64 ad){
+	struct proc* p = myproc();
+	struct vma* v = p->vmas;
+	int i;
+	for(i = 0; i < NVMA; i++)
+		if( v[i].state == VMA_USED && v[i].start <= ad && v[i].sz + v[i].start > ad )
+			return 1;
+	return 0;
+}
+
 // Given a parent process's page table, copy
 // its memory into a child's page table.
 // Copies both the page table and the
@@ -318,10 +332,13 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   char *mem;
 
   for(i = 0; i < sz; i += PGSIZE){
+	int wait = waitforalloc(i);
     if((pte = walk(old, i, 0)) == 0)
       panic("uvmcopy: pte should exist");
-    if((*pte & PTE_V) == 0)
+    if(!wait && (*pte & PTE_V) == 0 )
       panic("uvmcopy: page not present");
+	else if(wait && (*pte & PTE_V) == 0)
+	  continue;
     pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)

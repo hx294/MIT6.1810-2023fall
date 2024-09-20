@@ -471,6 +471,7 @@ stati(struct inode *ip, struct stat *st)
 int
 readi(struct inode *ip, int user_dst, uint64 dst, uint off, uint n)
 {
+	//printf("off:%d\n",off);
   uint tot, m;
   struct buf *bp;
 

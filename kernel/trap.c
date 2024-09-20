@@ -3,8 +3,12 @@
 #include "memlayout.h"
 #include "riscv.h"
 #include "spinlock.h"
+#include "sleeplock.h"
 #include "proc.h"
+#include "fs.h"
 #include "defs.h"
+#include "fcntl.h"
+#include "file.h"
 
 struct spinlock tickslock;
 uint ticks;
@@ -68,9 +72,58 @@ usertrap(void)
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {
-    printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-    printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
-    setkilled(p);
+	  if(r_scause() == 15 || r_scause() == 13 ){
+		// printf("page-fault%p\n",r_stval());
+		int i,perm = 0;
+		uint64 va = r_stval();
+		uint64 sz = 0;
+		if(va > p->sz){
+			goto bad;
+		}
+		
+		// find the vma;
+		struct vma *v = p->vmas;
+		for(i=0; i<NVMA; i++){
+			if(v[i].state == VMA_USED && v[i].start <= va 
+					&& v[i].start + v[i].sz > va){
+				break;
+			}
+		}
+		if(i == NVMA){
+			goto bad;
+		}
+
+		if(v[i].prot & PROT_EXEC)
+			perm |= PTE_X;
+		perm |= PTE_W;
+		perm |= PTE_D;
+		if((sz = uvmalloc(p->pagetable,va & ~0xfff,(va &~0xfff)+PGSIZE,perm)) == 0){
+			goto bad;
+		}
+		// copy from file to mem
+		struct file* fp = v[i].f;
+		struct inode* ip = fp->ip;
+	
+		// printf("ip:%d",i);
+		ilock(ip);
+
+		if(readi(ip,1,va & ~0xfff,v[i].off + ((va & ~0xfff) - v[i].start ),PGSIZE) == -1){
+			iunlock(ip);
+			goto bad;
+		}
+
+		iunlock(ip);
+
+		if((v[i].prot & PROT_WRITE) == 0)
+		{
+			pte_t *pte = walk(p->pagetable,va,0);
+			*pte &= ~PTE_W;
+		}
+	  }else{
+bad:	printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+		printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+		setkilled(p);
+	  }
   }
 
   if(killed(p))

@@ -4,8 +4,8 @@ typedef long int off_t;
 #endif
 struct buf;
 struct context;
-struct file;
 struct inode;
+struct file;
 struct pipe;
 struct proc;
 struct spinlock;

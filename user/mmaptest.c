@@ -113,6 +113,7 @@ mmap_test(void)
   char *p = mmap(0, PGSIZE*2, PROT_READ, MAP_PRIVATE, fd, 0);
   if (p == MAP_FAILED)
     err("mmap (1)");
+  // printf("%p\n",p);
   _v1(p);
   if (munmap(p, PGSIZE*2) == -1)
     err("munmap (1)");
@@ -156,6 +157,7 @@ mmap_test(void)
   if ((fd = open(f, O_RDWR)) == -1)
     err("open (3)");
   p = mmap(0, PGSIZE*3, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  // printf("111%p\n",p);
   if (p == MAP_FAILED)
     err("mmap (4)");
   if (close(fd) == -1)
@@ -218,18 +220,23 @@ mmap_test(void)
   if (unlink("mmap1") == -1)
     err("unlink (1)");
 
-  int fd2;
+   int fd2;
   if((fd2 = open("mmap2", O_RDWR|O_CREATE)) < 0)
     err("open (6)");
   if(write(fd2, "67890", 5) != 5)
     err("write (2)");
   char *p2 = mmap(0, PGSIZE, PROT_READ, MAP_PRIVATE, fd2, 0);
+  // printf("p2:%s\n",p2);
   if(p2 == MAP_FAILED)
     err("mmap (6)");
   if (close(fd2) == -1)
     err("close (6)");
   if (unlink("mmap2") == -1)
     err("unlink (2)");
+	
+  // printf("fd1:%d,fd2:%d\n",fd1,fd2);
+  // printf("p2:%s\n",p2);
+  // printf("p1: %p,p2: %p\n",p1, p2);
 
   if(memcmp(p1, "12345", 5) != 0)
     err("mmap1 mismatch");
@@ -238,6 +245,7 @@ mmap_test(void)
 
   if (munmap(p1, PGSIZE) == -1)
     err("munmap (5)");
+  // printf("p2:%s",p2);
   if(memcmp(p2, "67890", 5) != 0)
     err("mmap2 mismatch (2)");
   if (munmap(p2, PGSIZE) == -1)
@@ -275,6 +283,7 @@ fork_test(void)
   if (p2 == MAP_FAILED)
     err("mmap (8)");
 
+  // printf("1111\n");
   // read just 2nd page.
   if(*(p1+PGSIZE) != 'A')
     err("fork mismatch (1)");
@@ -283,6 +292,7 @@ fork_test(void)
     err("fork");
   if (pid == 0) {
     _v1(p1);
+	// printf("child:\n");
     if (munmap(p1, PGSIZE) == -1) // just the first page
       err("munmap (7)");
     exit(0); // tell the parent that the mapping looks OK.
@@ -295,6 +305,7 @@ fork_test(void)
     printf("fork_test failed\n");
     exit(1);
   }
+  // printf("parent\n");
 
   // check that the parent's mappings are still there.
   _v1(p1);

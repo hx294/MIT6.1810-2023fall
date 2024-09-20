@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "fcntl.h"
 
 struct cpu cpus[NCPU];
 
@@ -312,6 +313,15 @@ fork(void)
 
   pid = np->pid;
 
+  // vma copy and increment reference counts on mapped files
+  struct vma* v = p->vmas;
+  struct vma* nv = np->vmas;
+  for(i = 0; i < NVMA; i++)
+	  if(v[i].state == VMA_USED){
+		  nv[i] = v[i];
+		  filedup(nv[i].f);
+	  }
+  	
   release(&np->lock);
 
   acquire(&wait_lock);
@@ -347,6 +357,29 @@ void
 exit(int status)
 {
   struct proc *p = myproc();
+
+  struct vma* v = p->vmas;
+  for(int i=0; i<NVMA; i++){
+	  if(v[i].state == VMA_USED && v[i].sz){
+		int start = v[i].start;
+		int end = v[i].start+v[i].sz;
+		if((v[i].prot & PROT_WRITE) && (v[i].flags & MAP_SHARED)){
+			int temp = start;
+			while(temp < end){
+				if(*(walk(p->pagetable,temp,0)) & PTE_D)
+					filewrite(v[i].f,temp,PGSIZE);
+				temp += PGSIZE;
+			}
+		}
+
+		if(*walk(p->pagetable,start,0) & PTE_V)
+			uvmunmap(p->pagetable,start,(end-start)/PGSIZE,1);
+		p->sz -= (end-start);
+		v[i].sz = 0;
+		fileclose(v[i].f);
+		v[i].state = VMA_UNUSED;
+	  }
+  }
 
   if(p == initproc)
     panic("init exiting");
