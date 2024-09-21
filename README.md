@@ -10,6 +10,17 @@
 
 
 实验可能会用的材料：https://pdos.csail.mit.edu/6.S081/2023/reference.html
+
+## 使用指南
+通过下面的命令将仓库克隆到本地
+```
+    git clone git@github.com:hx294/MIT6.1810-2023fall.git
+```
+
+进入目录，位于main分支。如果想查看我某个lab的代码,例如util,可以切换分支：
+```
+    git checkout util
+```
 ## lab 文档
 记录了一下每个lab的过程，大部分思路都是跟着hint一步步写下去。
 - [util](<documents/Xv6 and Unix utilities.md>)
