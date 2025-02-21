@@ -126,6 +126,58 @@ e1000_recv(void)
 
 这张图很好说明了为什么，使用tail加一来迭代。因为tx是将包交给硬件处理，而rx是将包由硬件交给软件处理.而软件控制tail，则都使用加法。
 
+**接收方不加锁的原因是，net_rx如果处理到RAP报文，会直接发送报文出去，导致和transmit 发生死锁。** 具体流程如下：
+```
+// net.c
+void net_rx(struct mbuf *m)
+{
+	....
+  type = ntohs(ethhdr->type);
+  if (type == ETHTYPE_IP)
+    net_rx_ip(m);
+  else if (type == ETHTYPE_ARP)
+    net_rx_arp(m);
+  else
+    mbuffree(m);
+}
+
+// receives an ARP packet
+static void
+net_rx_arp(struct mbuf *m)
+{
+  ....
+  net_tx_arp(ARP_OP_REPLY, smac, sip);
+  ....
+}
+
+// sends an ARP packet
+static int
+net_tx_arp(uint16 op, uint8 dmac[ETHADDR_LEN], uint32 dip)
+{
+	....
+  net_tx_eth(m, ETHTYPE_ARP);
+	....
+}
+
+// sends an ethernet packet
+static void
+net_tx_eth(struct mbuf *m, uint16 ethtype)
+{
+  struct eth *ethhdr;
+
+  ethhdr = mbufpushhdr(m, *ethhdr);
+  memmove(ethhdr->shost, local_mac, ETHADDR_LEN);
+  // In a real networking stack, dhost would be set to the address discovered
+  // through ARP. Because we don't support enough of the ARP protocol, set it
+  // to broadcast instead.
+  memmove(ethhdr->dhost, broadcast_mac, ETHADDR_LEN);
+  ethhdr->type = htons(ethtype);
+  if (e1000_transmit(m)) {
+    mbuffree(m);
+  }
+}
+```
+
 还有到达的数量可能多于环的大小。所以处理一定要及时，所以采用循环。还看到有一种直接在这个函数中死循环不出去，不知道这种方法的可行性，以后再探究。[MIT6.S081-Lab7 Lab Networking [2021Fall\] - duile - 博客园 (cnblogs.com)](https://www.cnblogs.com/duile/p/16277647.html#写在前面)
 
 ![image-20240826185305488](<Lab7 networking/image-20240826185305488.png>)
