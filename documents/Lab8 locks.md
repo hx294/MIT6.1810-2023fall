@@ -216,7 +216,7 @@ hints：
 - Read the description of the block cache in the xv6 book (Section 8.1-8.3).
 - It is OK to use a fixed number of buckets and not resize the hash table dynamically. Use a prime number of buckets (e.g., 13) to reduce the likelihood of hashing conflicts.
 
-使用素数桶来减少散列冲突的可能性。因为使用合数的话，桶就少了，用取模的方法分析。
+使用素数桶来减少散列冲突的可能性。因为使用合数的话，桶就少了，用取模的方法分析（如果键值都是等差数列，就容易聚集在几个桶中）。
 
 - Searching in the hash table for a buffer and allocating an entry for that buffer when the buffer is not found must be atomic.
 
