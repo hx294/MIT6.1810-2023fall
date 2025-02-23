@@ -490,7 +490,7 @@ sys_open(void)
 
 先说结论：sys_symlink要调用iput处理y的inode
 
-举个例子：如果不iput，那么ref不会减小，unlink无法将软链接y释放，但是可以将目录中y的记录删除。
+举个例子：如果不iput，那么ref不会减小，unlink无法将软链接y释放，但是可以将目录中y的记录删除。这里要理解ref是指对该inode的硬数量。
 
 sys_unlink()中删除记录的代码。
 
