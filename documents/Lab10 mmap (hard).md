@@ -1,5 +1,7 @@
 # Lab: mmap ([hard](https://pdos.csail.mit.edu/6.S081/2023/labs/guidance.html))
 
+本lab实现的mmap仅能够实现将文件映射到内存，而正常mmap还应该包括设备的映射。
+
 map 和 munmap 系统调用 允许unix程序对地址空间实施细致的控制。这两个用于在进程中分享内存，映射文件到进程地址空间中，作为页错误机制的一部分，像垃圾回收算法。这个实验专注于内存
 
 映射文件。
